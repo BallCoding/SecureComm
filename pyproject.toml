@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "securecomm"
+version = "0.1.0"
+description = "High-security communication toolkit for text and file encryption"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=46.0.0",
+    "argon2-cffi>=25.0.0",
+]
+
+[project.scripts]
+securecomm = "securecomm.main:run"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
