@@ -1,0 +1,236 @@
+PAGES: 78
+
+---PAGE 1---
+附录佐证材料（原创开源软件） 一、功能介绍 EasyTransfer 是一款免费、 匿名、 加密且易于使用的 E2EE 文件传输 工具。只需访问 https://file.ch3nyang.top/，即可使用设备代码连接到任何 网络中的任何设备。 在数据传输方面，本项目实现了：
+
+---PAGE 2---
+ 匿名注册： 不需要注册账号， 不需要登录， 不需要提供个人信息；  加密传输：默认加密，确保文件传输的安全性；  端到端链接：文件直接从发送方传输到接收方，不经过服务器；  跨网络通信：同时支持局域网和公网之间的文件传输；  多媒体消息：支持发送文字及多种文件类型，还支持拍照发送； 此外，本项目支持了大量自定义设置：  最大连接数；  TURN / STUN 服务器；  自动展示图片；  自动文件下载；  自动链接识别。 在易用性方面，本项目考虑了：
+
+---PAGE 3---
+ 性能：优化了所有无用代码，动态内容尽量在编译时生成；  无障碍：充分考虑残障人士需求，满足国际标准；  SEO：进行了小规模 SEO，促进网站推广。 二、社会价值 本项目作为 2C 项目，自 2024 年 11 月末上线以来获得了用户的广泛 关注。 目前， 项目稳定的月访问人数超过 8,000 人， 上线四个月来总访问人 数超过 50,000 人。这些用户带来了月均超过 120,000 次的请求。
+
+---PAGE 4---
+项目在 GitHub 上获得众多用户关注，目前已有 568 个 Star、103 个 fork。项目目前共有 6 名贡献者（包括一个 bot），先后解决用户 Issue 十 余条，推送七十余条 PR。 项目同时引起了众多专家和博主的关注。例如：  阮一峰： （2024 年 12 月 13 日）  小众软件 受到的推荐数量较多，此处只列举关注度较高的。 三、文档说明
+
+---PAGE 5---
+使用方法如下： 1. 在需要传输文件的两台设备上访问 EasyTransfer （https://file.ch3nyang.top/）。 2. 将任意一台设备的四位设备代码输入到另一台设备的设备代码输 入框中，并点击连接按钮。 3. 等待连接成功后，您可以将文件拖放到网页上的文件区域，或者 点击文件区域选择文件。支持一次性发送多个文件。 4. 在设置中， 可以自定义 STUN 服务器和 TURN 服务器， 或者指 定最大连接数。 项目支持本地运行开发： 1. Glitch 最高只支持 Node.js 16，而 Client 使用 Node.js 22。为了 避免在本地安装两个不同版本的 Node.js，推荐在 Glitch 上部署 开发用的信令服务器。可以在 ./client/.env.development 中设置其 地址。 2. 可以在 client 文件夹中启动 Client： cd client npm run dev 访问命令行提示的地址即可预览。 3. 在对代码做出更改后，需要 lint 和 format： npm run lint npm run format 项目支持自行部署：
+
+---PAGE 6---
+1. 克隆本项目： git clone https://github.com/WCY-dt/EasyTransfer.git cd EasyTransfer 2. 对于信令服务器，在项目根目录下运行： docker build -t server-image -f ./Dockerfile . docker run -d -p 3000:3000 server-image 3. 您可以根据需要修改暴露的端口号。 4. 修改客户端代码中的信令服务器地址。在 ./client/.env.production 中修改 VITE_SIGNAL_SERVER_URL 为您刚刚部署的信令服 务器地址。 5. 修改客户端代码中的 STUN 和 TURN 服务器地址。 如果您额外 部署了 STUN 和 TURN 服务器，您可以在 ./client/src/const.ts 中修改 iceServers 为您自己的 STUN 和 TURN 服务器地址。 6. 对于客户端网页，运行： cd client docker build -t client-image -f ./Dockerfile . docker run -d -p 80:80 client-image 您可以根据需要修改暴露的端口号。 四、安全测试
+
+---PAGE 7---
+本项目目前已经开启了各项安全保护措施，以检查漏洞。包括：  安全条例：告知支持安全更新的版本；  Dependabot：自动更新依赖至最新的安全版本；  漏洞报告：独立发现软件漏洞的安全研究人员可以通过该渠道向 作者报告漏洞相关信息；  代码扫描：基于 CodeQL 的代码漏洞扫描；  密钥扫描：阻止推送包含秘密信息的提交。 在服务器方面，项目基于 WebRTC 协议实现，协议本身满足安全特 性。易受攻击的薄弱处在 TURN/STUN 服务器。 项目免费提供的 TURN 服务器考虑到成本问题，部署在洛杉矶机房
+
+---PAGE 8---
+的一台 VPS 上，使用 coturn 作为服务组件。由于 coturn 本身也是开源软 件，因此可以认为其基本安全。 同时，为了满足对安全需求较高的用户，项目同时给出了自行部署 TURN 服务器的指南。用户在部署后可以通过设置 ICE Servers 来修改软 件使用的 TURN 服务器地址。 五、代码截图 项目共包含 58 个文件、5640 行代码（不包括第三方库及 package- lock.json 等自动生成文件） ，主要为Vue.js 和 TypeScript。
+
+---PAGE 9---
+
+
+---PAGE 10---
+附录佐证材料（原创开源软件） 一、功能介绍 （1.要求拥有3种以上相互独立的功能；请介绍并提供证明。2.要求能够被第三方程序引用或可编译为可执行软件，具备用户交互功能；请介绍并提供证明。 ） 该平台专为系统脆弱性和安全性检测设计，支持 Ubuntu 20.04 操作系统。功能包括资产清点、安全基线检测、安全风险评估和安全等级保护测评，并输出详细的检测报告。 首页： 主机发现： 主机发现是将目标主机纳入安全管理范围的方式，是开启检测过程的起点，可以对网段或单个IP进行存活探测。输入IP地址
+
+---PAGE 11---
+(如:192.168.1.120)或 网段 (如: 192.168.1.0/24) 基线检测： 依据等保2.0，对 目 标 主 机 进 行 基 线 检 测 。目 前 支 持linux操作系统。
+
+---PAGE 12---
+基线检测报告： 包括目标主机的基本信息和基线检测中的检测项、基准、检测结果、是否通过、整改建议等。 知识库： 目前有POC库，管理平台所支持的漏洞的POC验证。可以对POC进行增删改查等操作。
+
+---PAGE 13---
+新增或者编辑POC代码时，需按照平台所指定的模板来进行编辑代码，在适应平台统一处理方式的同时，简化代码编写，提升编写POC效率。 POC模板使用方式在首页可以下载。
+
+---PAGE 14---
+漏洞扫描 选择存活的IP即可进行扫描。标准扫描为常见1000端口的扫描，全端口扫描为65535所有端口扫描。
+
+---PAGE 15---
+点击扫描结果中的cpe信息，可以看到通过版本匹配得到的可能存在的CVE漏洞。 也可以进行进一步的POC验证，查看验证结果等。
+
+---PAGE 16---
+插件化扫描 这是第二种漏洞扫描的方式，即可以不通过版本匹配的方式，直接选取想 执行的POC插件，进行扫描。支持自动选择 （自动选择基于对方开启的服务或是使用的操作系统、协议等，进行与POC里面的相关基础设施匹配得到）
+
+---PAGE 17---
+弱口令检测 选取目标IP、待检测的服务，即可对对应端口进行弱口令检测。如果此前没有进行过预扫描或者其他扫描（如漏洞扫描等） ，则需要预扫描，然后才能进行检测。同时支持管理用户名字典和密码字典 等级保护测评 根据各项检测情况，对目标主机进行统一的等级保护测评，并给出分数。
+
+---PAGE 18---
+资产管理 对主机的各安全检测项进行统一可视化展示。
+
+---PAGE 19---
+二、社会价值 三、文档说明 （要求详细描述项目的安装步骤、使用方法；请文字说明。 ） 操作系统 本平台仅在 Ubuntu 20.04 上测试通过，建议在此系统上运行以保证兼容性。 外部工具依赖 1.Nmap • 用于端口扫描。请安装 nmap 工具并进行以下配置，以便平台在无密码情况下执行 Nmap 命令： sudo apt-get update sudo apt-get install -y nmap 配置无密码执行 Nmap 操作： sudo visudo
+
+---PAGE 20---
+在文件末尾添加以下内容，将 username 替换为实际的用户名： username ALL=(ALL) NOPASSWD: /usr/bin/nmap username ALL=(ALL) NOPASSWD: /bin/chown username ALL=(ALL) NOPASSWD: /bin/chmod 配置 Nmap 扫描结果文件的输出目录： //在输出目录out/ 下配置： mkdir -p output_nmap sudo chown username:username output_nmap sudo chmod 777 output_nmap 2.CVE-Search 平台的漏洞库匹配方式使用 CVE-Search，如未安装，可参考：https://medium.com/@jieshiun/%E5%A6%82%E4%BD%95%E5%9C%A8-ubuntu-20-04-%E5%AE%89%E8%A3%9D-cve-search-%E4%BC%BA%E6%9C%8D%E5%99%A8-9d045a65cc70 3.C++依赖库 本项目使用 vcpkg 进行依赖管理。以下为所需的库： 安装 vcpkg 后，依次执行以下命令： vcpkg install libssh vcpkg install sqlite3 cpprestsdk vcpkg install icu vcpkg install curl[core,non-http,openssl,ssl] vcpkg install uchardet vcpkg install nlohmann-json
+
+---PAGE 21---
+vcpkg install mysql-connector-cpp:x64-linux vcpkg install spdlog 其他系统依赖安装： sudo apt-get update sudo apt-get install -y autoconf automake autoconf-archive ninja-build 说明：如果不使用 vcpkg 管理依赖，可手动安装上述库并确保 CMake 工程能够找到所需头文件和库路径。 4.数据库 将目录下的sql文件在目标服务器先执行。可以利用navicat #1.安装mysql #2.登录mysql： mysql -u root -p #3.创建数据库： CREATE DATABASE test_db #4.执行SQL文件： mysql -u root -p your_database_name < /path/to/your.sql #5.配置mysql远程连接： #在localhost登入mysql后， 更改 “mysql” 数据库里的 “user” 表里的 “host” 项，将"localhost"改称"%（代表允许远程） update user set host = '%' where user = 'root'; select host, user from user; 5.Hydra 弱口令检测需要的工具 sudo apt update
+
+---PAGE 22---
+sudo apt install hydra #安装完成后，可以通过以下命令验证安装： hydra -h 然后在Linux根目录下创建/hydra路径 sudo mkdir /hydra 然后将项目中的usernames.txt和passwords.txt放到这个目录下 /hydra/ 前端 项目前端网站：https://github.com/attente12/NetSec-testing/tree/master/demo 使用 IntelliJ IDEA 作为开发工具： 1. 打开项目时，确保选择项目根目录。 2. 配置 Node.js 路径： o 打开 File > Settings > Languages & Frameworks > Node.js and NPM。 o 指定 Node.js 安装路径。 3. 配置运行/调试任务： o 点击右上角的运行配置下拉菜单，选择 Edit Configurations。 o 添加 npm 任务，设置 serve 为默认任务。 四、安全测试 （要求没有人为故意植入恶意代码； 请说明安全测试方法并提供证明） 五、代码截图
+
+---PAGE 23---
+开发代码行数：共27465行 代码目录结构：
+
+---PAGE 24---
+详细代码可见github主页， 以下是部分代码截图：
+
+---PAGE 25---
+SeverManager服务器交互代码： 漏洞扫描相关代码：
+
+---PAGE 26---
+主机发现相关代码：
+
+---PAGE 27---
+注：文字字体格式，仿宋、四号、行间距固定值25磅。
+
+---PAGE 28---
+附录佐证材料（原创开源软件） 一、功能介绍 原创软件 Traffic - Analysis - Base – DPDK 为基于 DPDK 的高性 能加密流量采集分析系统。 该系统可划分为5 个模块： 系统导航模块、 流量采集模块、业务分类模块、异常检测模块、IP 画像模块。 (1) 系统导航模块主要包含系统引导功能。 (2) 流量采集模块包含流量采集存储功能、流量下载功能、流 量详情查看功能、 流特征提取功能。 高性能流量采集与存储主要是基 于 DPDK 进行高速流量采集，实现对网络数据中心高速流量的捕获 与采集，同时以流（含有相同的源 IP 地址、宿 IP 地址、源端口、宿 端口、 协议的数据包集合） 为单位提取流量的时空特征， 并将提取的 时空特征持久化到流量数据库中，为后续的流量分析提供数据基础。 (3) 加密流量业务分类模块包括业务类别映射功能、文件上传 功能、 特征提取功能、 业务分类模型训练功能、 业务分类功能。加 密 流量业务分类为实现针对加密流量的特定业务分类需求， 提出自动化 在线加密流量采集与样本构建、 业务分类模型构建的两阶段技术实现 系统功能。 自动化在线加密流量采集与样本构建部分将顺序执行自动 化样本采集与初步标记、 样本标签构建、 样本提纯与特征提取。 基于 异构特征的业务分类则分为基于轻量级模型的高效业务分类、 基于深 度学习模型的高精度业务分类和基于多模型联合的均衡业务分类。 (4) 加密流量异常检测模块 包括查看异常检测历史功能、启动 异常检测功能、 查看异常检测详情功能。 加密流量异常检测以高性能 流量采集存储和加密流量业务分类两部分的实现为前提， 在此基础上 实现对加密流量的异常检测。 加密流量异常检测依据真实网络场景下 的设备级流量提出多种异常情况和相应评判策略， 并基于此构建流量 异常检测模型， 并系统实现异常检测功能， 在在线监测中及时对异常
+
+---PAGE 29---
+情况进行预警，满足本系统在面向业务分类的异常检测需求。 (5) IP 画像模块包括生成 IP 画像功能、地图显示功能。以 IP 加密流量异常检测提出设备级流量画像的构建， 从系统数据库的构建 层面实现了流量信息及预测结果的时空粒度划分， 实现了本项目对于 业务分类结果时空划分的要求。针对流量分析领域的概念漂移问题， 基于自演进策略设计了设备级流量画像及业务分类模型的生命周期 维持方法。 该系统以先进性、创新性理论应用于项目实施，实现 流量采集 —— 业务分类—— 异常检测全流程的支持服务提供， 及时应对服务设 备的流量行为异常， 保障网络与信息系统运行的有效性和可靠性。 同 时， 以增量式自演进策略实现画像、 模型的动态更新， 保证异常检测 功能的生命周期长久性， 保障真实网络环境进行持续化加密流量监管。 1.1 工作原理 首先， 针对流量标签样本采集存在背景流量干扰问题， 实现网络 流量采集与样本构建方法， 通过自动化提取时间窗口内的进程PID 与 网络端口之间的映射关系， 实现进程与网络流量的对应， 在真实端系 统场景下对各个进程的流量进行隔离性自动化流量采集与初步样本 构建。 其次， 软件实现面向原始采集的加密流量进行特征提取操作。 同 时， 选择性清除弱相关流量数据， 过滤特定加密流量， 保留业务分类 高度敏感特征，实现样本提纯与特征提取。 再次， 将经过样本提纯与特征提取的流量数据特征导入基于异构 特征的多级业务分类功能模块中， 充分利用异构特征和样本标签， 分 别采用传统集成学习、 深度学习等分类模型进行训练， 生成训练样本 数据集。 随后，启动基于 DPDK 的流量采集功能，根据流量采集的实际 需求及 DPDK 框架的特性， 将几种不同的任务分别绑定到不同的CPU
+
+---PAGE 30---
+上，分别完成采集程序控制和网络数据流量采集。 然后， 将采集后的数据流量批量取出数据包进行特征提取， 解析 数据包各层的协议格式， 提取数据包的五元组信息， 并判断数据包的 源 IP 地址/宿 IP 地址是否已经存在，写入设备 IP 特征流表中。 同时，完成特征提取后，生成 pcap 文件，并将设备的流特征表 持久化到流量数据库中。 此外， 需要将持久化数据中的流量特征和标签导入基于异构特征 的多级业务分类模块进行样本预测， 实现多级业务分类， 并将分类结 果持久化到数据库，以供后续异常检测查询。 最后， 将持久化数据中的流量特征和业务标签引导加密流量异常 检测模块进行设备级流量画像构建和面向业务分类的异常检测， 经面 向业务分类的异常检测检测后的异常结果持久化到数据库中。另外， 在异常检测模块中， 本系统还提供了设备画像及检测模型的生命周期 维持方法， 基于时间周期完成模型的自动迭代， 最终保证流量异常检 测功能的持续有效性和可用性。 1.2 系统导航模块 用户引导功能。 1.2.1 模块说明： 落地页面如下图 1-1 所示：
+
+---PAGE 31---
+
+
+---PAGE 32---
+
+
+---PAGE 33---
+图 1-1 首页界面 该页面展示了系统的主要功能， 并有相应功能的介绍、功能链接、 使用方法和开源仓库链接等。 1.2.2 操作步骤 1) 在浏览器中输入“localhost:?”，自动跳转至落地页 2) 点击功能按钮，进入各个功能页。 1.3 流量采集模块 流量采集功能、 流量下载功能、 流量详情功能、 流特征提取功能。 1.3.1 模块说明 流量采集模块页面如下图所示， 上方为导航栏，该导航栏用于切 换模块操作。 下方区域是流量采集模块的展示内容， 在还未进行流量 采集操作是， 该区域由两部分组成， 上面是一个输入表单， 用于输入
+
+---PAGE 34---
+采集的条件，包括采集的 IP 地址、端口、协议以及采集时间。下面 是一个表格，显示了当前服务器中已采集的流量信息。 图 1-2 流量采集模块页面 进行流量采集后流量采集模块的前端页面会变化成如上图所示， 中间区域新增了一个显示当次流量采集的统计信息， 并使用图片的形 式进行展示。包括采集的包数量随时间的变化趋势以及丢包情况。 本模块还提供流量详情查看功能， 可在线查看报文的统计信息和 详细内容，其页面如下图所示。 图 1-3 流量详情查看页面 本模块还提供在线流特征提取功能， 可实时进行流特征提取， 其 页面如下图所示。
+
+---PAGE 35---
+图 1-4 在线流特征提取页面 1.3.2 操作步骤： (1) 流量采集功能 1) 点击导航栏的“流量采集模块”； 2) 根据需要输入流量采集过滤条件； ① 若不输入 IP 地址过滤项，则默认抓取所有被管网内 IP 地 址产生的流量； ② 若不输入端口过滤项，则默认抓取所有端口的流量； ③ 若不输入协议过滤项，则默认抓取所有协议的流量； ④ 若不输入采集时间项，则默认抓取 10 秒钟的流量； 3) 点击“开始采集”按钮，等待采集结果； ① 若输入的 IP 地址项不正确，则提示输入有误。 ② 若采集成功，则显示当次流量采集的统计信息，并使用图 片的形式进行展示。采集的包数量随时间的变化趋势以及丢包情况。 ③ 若采集失败，则系统进行提示。
+
+---PAGE 36---
+图 1-5 流量采集功能操作步骤 (2) 流量下载功能 1) 选中需要下载的流量包左侧的复选框（全选可使用右上角的 “全选”按钮）。 2) 点击右上角的“下载”按钮，即可通过浏览器下载流量包。 图 1-6 流量下载功能操作步骤 (3) 流量详情查看功能 1) 在“流量采集”页面中点击需要查看的流量包文件名 2) 在弹出的新窗口查看流量详情 3) 点击页面顶端的“导航栏”可切换至相应的“统计信息” 4) 点击“导航栏”中的数据包，稍等片刻可切换至报文详情页面 ① 输入过滤语句以过滤特定报文（默认为空字符串） ② 点击“过滤”按钮以使用新的过滤语句重新加载报文详情页
+
+---PAGE 37---
+面 ③ 点击选中感兴趣的报文条目以显示报文详细内容 图 1-7 流量详情功能操作步骤 图 1-8 流量详情表格演示 (4) 流特征提取功能 1) 根据需要输入流量采集过滤条件
+
+---PAGE 38---
+① 若不输入 IP 地址过滤项，则默认抓取所有被管网内 IP 地 址产生的流量； ② 若不输入端口过滤项，则默认抓取所有端口的流量； ③ 若不输入协议过滤项，则默认抓取所有协议的流量； ④ 若不输入采集时间项，则默认抓取 10 秒钟的流量； 2) 点击“特征提取”按钮 ① 若输入的 IP 地址项不正确，则提示输入有误； ② 若采集成功，则显示当次流量采集的统计信息，并使用图 片的形式进行展示。采集的包数量随时间的变化趋势以及丢包情况。 ③ 采集失败，则系统进行提示。 3) 点击停止即可停止流特征提取，点击导出可以导出特征文件。 图 1-9 流特征提取页面 1.4 业务分类模块 业务类别映射功能、 文件上传功能、 特征提取功能、 业务分类模 型训练功能、业务分类功能。 1.4.1 模块说明： 业务分类模块总共包括三个功能， 分别是业务类别映射功能、 业 务分类模型训练功能以及业务分类功能。 业务类别映射功能页面如下图所示， 该页面显示了当前所使用的
+
+---PAGE 39---
+分类业务类型以及各业务类型对应的程序名称。 该页面可以使得用户 能够自定义需要分类的业务类别和各类别对应的程序。 图 1-10 业务类别映射功能页面 进行模型训练前的业务分类模型训练功能页面如下图所示， 在该 页面能够进行上传 pcap 文件用于模型训练、选择上传的流量文件进 行特征提取以及基于提取的特征进行模型训练这三个行为， 在进行完 模型训练后在该页面底部会展示该次模型训练的结果， 包括模型的f1 score、准确率、精确率和召回率。 图 1-11 业务分类模型功能页面
+
+---PAGE 40---
+图 1-12 业务分类模型训练 进行分类前的业务分类功能页面如下图所示， 在该页面能够选择 流量分类的各个参数，包括要分类的 IP 地址、分类的置信度、分类 使用的模型以及分类数据的时间段。 在完成业务分类后， 在该页面底 部会通过饼图的方式展示该次业务分类的结果。 图 1-13 业务分类结果 1.4.2 操作步骤： (1) 业务类别映射功能 1) 点击导航栏的“业务分类模块”； 2) 点击导航栏的“业务类别映射”； 3) 根据页面修改业务类别和各业务类别包含的程序； ① 若要添加新的业务类别，则点击添加业务类别按钮，然后 跳转到 4)-①步；
+
+---PAGE 41---
+② 若要给某一个业务类别添加新的程序，则点击该业务类别 区域的添加业务名称按钮，然后跳转到 4)-②步； ③ 若要删除现有的业务类别，则点击要删除业务类别区域最 右边的“×”图标； ④ 若要删除某一类业务类别中的某一个程序，则点击该程序 区域右边的“×”图标； 4) 弹出对话框； ① 在弹出的对话框中输入添加的业务类别，点击“是”按钮； ② 在弹出的对话框中输入添加的程序名称，点击“是”按钮； 5) 重复步骤 1 和 2 直至完成所有修改，点击“提交修改”按钮 ① 页面根据后端返回结果提示是否修改成功。 图 1-14 业务类别映射功能步骤 (2) 文件上传功能 1) 点击导航栏的“业务分类模块”； 2) 点击导航栏的“业务分类模型训练”； 3) 选择要上传的 pcap/pcapng 文件所属业务类别； 4) 选择要上传的 pcap/pcapng 文件； 5) 点击“上传”按钮； ① 若未选择要上传的文件业务类别，则无法点击上传按钮； ② 若未选择文件，则提示未选择文件；
+
+---PAGE 42---
+③ 若选择的文件不是 pcap/pcapng 文件， 则提示文件格式错误； ④ 页面根据后端返回结果提示文件是否上传成功。 图 1-15 文件上传功能步骤 (3) 特征提取功能 1) 点击导航栏的“业务分类模块”； 2) 点击导航栏的“业务分类模型训练”； 3) 选择要进行特征提取的数据类别； 4) 输入存储特征提取结果的文件名； 5) 点击“开始特征提取”按钮； ① 若未选择数据类别和未输入存储特征提取结果的文件名则 无法点击“开始特征提取”按钮。 ② 页面根据后端返回结果提示特征是否提取成功。 图 1-16 特征提取功能步骤 (4) 业务分类模型训练功能 1) 点击导航栏的“业务分类模块”；
+
+---PAGE 43---
+2) 点击导航栏的“业务分类模型训练”； 3) 选择训练要使用的数据， 该数据为特征提取功能提取出的特征 数据； 4) 选择训练要使用的模型； 5) 点击“开始训练”按钮，等待训练结果； ① 若未选择要进行训练的数据和未选择要进行训练的模型则 无法点击“开始训练”按钮； ② 若后端返回训练成功； ③ 若选择的模型是 lstm 模型， 则显示该次训练的平均f1 score、 平均准确率、平均精确率和平均召回率；并绘制训练过程中 loss、训 练集准确率和测试集准确率的变化情况。 ④ 若选择的模型是 classic 模型，则仅显示该次训练的平均 f1 score、平均准确率、平均精确率和平均召回率。 ⑤ 若后端返回训练失败，则系统提示训练失败。 图 1-17 模型训练功能步骤 (5) 业务分类功能 1) 点击左侧导航栏的“业务分类模块”； 2) 点击中间导航栏的“业务分类”； 3) 根据需要输入流量分类参数条件； ① 若不输入要分类的 IP 地址项， 则默认分类所有被管网内IP 地址产生的流量； ② 若不输入置信度域值项，则默认为 0.4；
+
+---PAGE 44---
+③ 若不选择分类模型，则无法点击“开始分类”按钮； ④ 若选择要分类的起始时间和结束时间，则默认分类最新还 未分类的流量数据； 4) 点击“开始分类”按钮，等待分类结果 ① 若输入的 IP 地址项不正确，则提示输入有误； ② 若输入的置信度项不正确，则提示输入有误； ③ 若后端返回分类成功，则使用饼图绘制分类结果。 ④ 若后端返回分类失败，则系统提示分类失败。 图 1-18 业务分类功能步骤 1.5 异常检测模块 查看异常检测历史功能、 启动异常检测功能、 查看异常检测详情 功能。 1.5.1 模块说明： 异常检测模块能够对四种异常进行检测，即“ 流业务类型异常”、 “流量报文数异常”、“流量数据量异常”、“流量时间异常”。该模块按 照 IP 地址为粒度进行异常检测，展示所有检测轮次检测出的异常 IP 地址以及检测出的异常， 并能够查看异常检测的详细结果， 其页面如 下图 1-19 所示。
+
+---PAGE 45---
+图 1-19 异常检测页面 异常检测包括一个“ 开始检测”按钮和一个展示异常检测历史的 表格，通过点击“开始检测”按钮能够进行异常类型的动态检测。 图 1-20 异常类型的动态检测 异常检测历史表格有四列， 异常检测时间表示此次异常检测轮次 的时间，异常 IP 表示此次检测出异常的 IP 地址，异常类型表示此次 异常检测此 IP 地址检测出的异常类别， 异常检测报告内是一个按钮， 点击后跳转到此次异常检测的详情页面。
+
+---PAGE 46---
+图 1-21 异常检测历史表格 异常检测模块展示了此次异常检测某 IP 地址所检测出来的异常 详情， 对于流业务类型异常， 系统通过表格进行展示， 展示了异常流 的一些信息，包括流的源 IP 地址、宿 IP 地址、源端口、宿端口、协 议号、报文数、字节数和持续时间。对于其他三种异常类型，即流量 报文数异常、 流量数据量异常和流量时间异常， 系统通过折线图的形 式进行展示，并通过红色三角形标注出异常点，如下图 1-22 所示。 图 1-22 异常检测的详情页面 1.5.2 操作步骤： (1) 查看异常检测历史功能 1) 点击导航栏的“异常检测模块”，等待后端返回结果； 2) 若后端成功返回异常检测历史， 则显示一个表格， 记录了异常 检测历史结果； 3) 若后端返回失败，则系统提示获取异常检测历史结果失败。
+
+---PAGE 47---
+(2) 启动异常检测功能 1) 点击导航栏的“异常检测模块”，等待后端返回结果； ① 若后端成功返回异常检测历史，则显示一个表格，跳转到 步骤 2； ② 若后端返回失败， 则系统提示获取异常检测历史结果失败， 直接结束； 2) 点击“开始检测”按钮，并等待后端返回异常检测结果； ① 若后端返回检测成功：系统提示检测成功并提示新检测出 的异常数目，并更新表格。 ② 若后端返回检测失败：系统提示检测失败。 图 1-23 启动异常检测功能步骤 (3) 查看异常检测详情功能 1) 点击导航栏的“异常检测模块”，等待后端返回结果； ① 若后端成功返回异常检测历史，则显示一个表格，跳转到 步骤 2； ② 若后端返回失败， 则系统提示获取异常检测历史结果失败， 直接结束； 2) 点击要查看详情的异常检测报告列， 等待页面跳转以及后端返 回查看异常检测详情结果；
+
+---PAGE 48---
+① 若后端返回检测成功， 进行页面跳转，并在新页面展示异 常检测详细信息。 ② 若后端返回检测失败， 进行页面跳转，并在新页面提示获 取异常检测详细信息失败。 图 1-24 查看异常检测详情功能步骤 1.6 IP 画像模块 生成 IP 画像功能、地图显示功能。 1.6.1 模块说明： IP 地址画像模块能够基于 IP 地址的历史流量数据对所选择的 IP 地址进行画像，其页面如下图 1-25 所示。 图 1-25 IP 画像页面
+
+---PAGE 49---
+该页面上方是一个输入框和按钮，这里可以通过手动的输入 IP 地址的方式对输入的 IP 地址进行画像。下方是通过知识图谱展示的 数据库中前 300 个 IP 地址的连接情况（由于前端浏览器资源限制， 展示过多 IP 地址会造成浏览器无法运行），可以通过点击知识图谱 中的节点查看该节点 IP 地址的画像结果。画像结果的详细信息通过 一个对话框进行展示，如下图 1-26 所示。 图 1-26 IP 画像结果的详细信息 在画像详情中，通过图表的形式展示了该 IP 地址所抓取流量的 报文总数、字节总数、流持续时间均值和流的业务分类结果。 该模块提供根据地理位置显示 IP 功能，可以看到各个地区之间 IP 的关系。 图 1-27 IP 的地区关联图
+
+---PAGE 50---
+1.6.2 操作步骤： 1) 点击导航栏的“IP 画像模块”，等待后端返回结果； ① 若后端成功返回前 300 个 IP 地址的连接关系， 则通过知识 图谱的方式进行展示； ② 若后端未成功获取前 300 个 IP 地址的连接关系， 则知识图 谱部分为空白； 2) 选择要查看画像的 IP 地址； 通过输入的方式，输入要查看画像的 IP 地址，点击进行画像按 钮，等待后端返回该 IP 地址画像结果。 3) 通过点击知识图谱上 IP 地址节点的方式，等待后端返回该 IP 地址画像结果； ① 若后端返回画像成功，则通过一个对话框展示画像结果。 ② 若后端返回画像失败，则系统提示画像获取失败。 4) 点击“显示地图”按钮， 可以看到在地图上显示的IP 地址节点。 图 1-28 IP 画像模块操作步骤
+
+---PAGE 51---
+图 1-29 地图显示功能操作步骤 2. 访问说明 在完成系统部署并启动后， 可使用任一现代浏览器终端访问系统 页面。 二、社会价值 本开源软件的应用情况和效益佐证获得了广泛认可。 开源原创软 件成果应用于网信、公安、科研院所、网络安全企业等 15 家单位， 销售额达 3.3 亿元， 经济效益显著。 成果为上海进博会、 二十大安保、 杭州亚运会等多项国家重大活动提供网络安全保障，社会效益显著， 处于领先水平，通过了鉴定委员会认定。
+
+---PAGE 52---
+图 2-1 应用情况和效益佐证材料 此外， 本开源软件在GitHub 上已有 142 次 star、92 次 fork 和 93 次 watching，在 Gitee 上已有 48 次 watch、56 次 star 和 38 次 fork。 作为原创软件， 这些数据也有力地证明了我们的软件得到了众多网友 的支持和认可。
+
+---PAGE 53---
+图 2-2 GitHub 和 Gitee 的 Star、Fork、Watching 数据 三、文档说明 3.1 文件内容介绍 (1) Backend——系统后端 (2) Backend_Dpdk_Collect—— 后端 Dpdk 采集部分 (3) Frontend——系统前端 (4) Frontend_Packet_Detail——数据包详情部分前端 3.2 环境配置过程 3.2.1 DPDK 安装与配置 Step1：系统需求  Linux 内核版本： 需要>=4.4， 可以使用以下命令来查看：uname -r  glibc 版本：>=2.7（不大于也行）：ldd --version  内核配置： 对于 Ubuntu 等常见 Linux 发行版提供的内核配置可 用于运行大多数 DPDK 程序，无需其他配置。 Step2：工具与库  通用开发工具（包括 C 编译器如 gcc 或 clang）：  RHEL/Fedora：dnf groupinstall "Development Tools"  Ubuntu/Debian：sudo apt install build-essential  Alpine Linux ： apk add gcc libc -dev bsd- compat-headers
+
+---PAGE 54---
+libexecinfo-devgcc (version 4.9+) 或 clang (version 3.4+)  pkg-config 或 pkgconf： sudo apt install build-essential  Python 3.5+  Meson (version 0.49.2+)、ninja：大多数 Linux 发行版自带，也可 以通过 pip 安装： sudo apt install python3-pip # 安装 pip3 install meson ninja export PATH=$PATH:/home/tbps/.local/bin # 添加环境变量  pyelftools(version 0.22+)： sudo apt install python3-pyelftools  处理 NUMA（Non Uniform Memory Access ，非均匀访问存储模 型）的库： sudo apt install libnuma-dev Step3 ：下载与安装 DPDK  从官网下载：https://fast.dpdk.org/rel/dpdk-21.11.1.tar.xz， 解压并进 入到 DPDK 源文件根目录： tar xJf dpdk-21.11.1.tar.xz cd dpdk-<version>  配置 DPDK： meson <options> build ## build: 所需的输出构建目录 ## options: 可选，是构建选项之一  构建并安装 DPDK： cd build ninja
+
+---PAGE 55---
+## 最后两个命令通常需要以 root 身份运行 sudo ninja install sudo ldconfig ## 如果 sudo ninja 或者 ldconfig 显示 command not found， 则直接 在 sudo 下安装 meson、ninja sudo pip3 install meson ninja Step4：配置 HugePages： 使用大页分配， 程序需要更少的页面， 性能增加， 如果没有大页， 标准大小 4k 的页面会导致频繁的 TLB miss。 法一：命令行修改 对于 2MB 的页面， 可以在运行时执行， 使用以下命令(假设需要 1024 个）： sudo su echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages 法二：配置文件修改 对于 1G 的 HugePages 需要在配置文件修改（推荐 64 位的系统配 置 1G 的 HugePages）： 1) 修改/etc/default/grub，在GRUB_CMDLINE_LINUX_DEFAULT 参数后追加： default_hugepagesz=1G hugepagesz=1G hugepages=4 ## 如果需要开启 intel_iommu 功能，需要追加： iommu=pt intel_iommu=on 2) 更新 grub： ## 重新生成 grub.cfg
+
+---PAGE 56---
+sudo grub-mkconfig -o /boot/grub/grub.cfg ## 更新 grub 配置 sudo update-grub 3) 最后重启系统： sudo reboot ## 查看 HugePages 信息 cat /proc/meminfo | grep Huge ## 验证 iommu 是否成功： cat /proc/meminfo |grep -i HugePages dmesg | grep DMAR 4) 挂载 HugePages： 为了 HugePages 可供 DPDK 使用，必须执行以下命令： sudo mkdir /mnt/huge sudo mount -t hugetlbfs pagesize=1GB /mnt/huge 通过在 /etc/fstab 文件中添加以下行，可以使挂载点在重新启动 后成为永久挂载点（自动挂载）： nodev /mnt/huge hugetlbfs pagesize=1GB 0 0 Step5：加载 kernel driver DPDK 一共有 VFIO，VFIO no-IOMMU，UIO，Bifurcated Driver 这四种 kernel driver。其中，VFIO 具有良好的健壮性与安全性，也 是最常用的一种驱动。 法一：加载 VFIO 驱动 1) 确保 BIOS 支持：输入以下命令不是空白或者 IOMMU Not Found 就是配置成功了： sudo dmesg | grep -e DMAR -e IOMMU 2) 内核支持：修改文件 /etc/default/grub （可以在前面配置
+
+---PAGE 57---
+HugePages 时一并修改）： 在 GRUB_CMDLINE_LINUX_DEFAULT 参数后继续追加加 iommu=pt intel_iommu=on： ## 验证配置成功： cat /proc/cmdline | grep iommu=pt cat /proc/cmdline | grep intel_iommu=on 3) 加载 kernel driver： sudo modprobe vfio-pci ## 修改权限 sudo /usr/bin/chmod a+x /dev/vfio sudo /usr/bin/chmod 0666 /dev/vfio/* 4) 查看 vfio 是否已经加载（没有显示，也不影响正常使用）： lsmod | grep vfio_pci vfio_pci 61440 0 vfio_virqfd 16384 1 vfio_pci vfio 36864 2 vfio_iommu_type1,vfio_pci irqbypass 16384 2 vfio_pci,kvm 法二：加载 VFIO no-IOMMU 驱动 1) 先卸载 vfio： sudo rmmod vfio-pci 2) 加载 vfio no-IOMMU： # 直接加载 sudo modprobe vfio enable_unsafe_noiommu_mode=1 # 在已加载的内核中启用 echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
+
+---PAGE 58---
+法三：加载 uio_pci_generic 驱动 在无法选择使用 VFIO 的情况下，可以使用其他驱动程序。在很 多情况下，Linux 内核中包含的标准 uio_pci_generic 模块可以用作 VFIO 的替代品。 加载 uio_pci_generic： sudo modprobe uio_pci_generic 法四：加载 igb_uio 驱动 作为 uio_pci_generic 的替代方案，可以使用 dpdk-kmods 中的 igb_uio 模块。 1) 前往 dpdk-kmods，复制网页下面的 git 链接： git clone git://dpdk.org/dpdk-kmods 2) 解压并编译： cd dpdk-kmods/linux/igb_uio make 3) 加载 igb_uio： sudo modprobe uio sudo insmod ./igb_uio.ko ## 如果显示参数不正确，就输入以下命令 sudo insmod ./igb_uio.ko intr_mode=legacy ## 如果显示权限不允许，则关闭 BIOS 里的安全启动 4) 查看是否加载： lsmod | grep uio igb_uio 20480 0 uio 20480 1 igb_uio 5) 关闭或穿透 IOMMU 修改 /etc/default/grub ，在 GRUB_CMDLINE_LINUX_DEFAULT
+
+---PAGE 59---
+参数后追加 intel_iommu=off 或 amd_iommu=off 或 intel_iommu=on iommu=pt（如果不关的话， 可能会导致 dpdk 抓不到 包，全是 iMiss）： GRUB_CMDLINE_LINUX_DEFAULT="quiet splash default_hugepagesz=1G hugepagesz=1G hugepages=4 amd_iommu=off" Step6：绑定网卡端口 建议优先将 vfio-pci 用作 DPDK 绑定端口的内核模块。 进入 dpdk-21.11/usertools，运行 dpdk-devbind.py： 1) 查看系统上所有网络端口的状态： sudo ./usertools/dpdk-devbind.py --status 2) 绑定网卡端口到 vfio-pci： ## 将设备 ens5f0(`86:00.0`) 绑定到 vfio-pci 驱动程序： sudo ./usertools/dpdk-devbind.py --bind=vfio-pci 86:00.0 ## 或者 sudo ./usertools/dpdk-devbind.py --bind=vfio-pci ens5f0 3) 重新绑定端口到内核： ## 取消绑定 sudo dpdk-devbind.py -u 0000:86:00.0 ## 重新绑定到内核 sudo dpdk-devbind.py --bind=ixgbe 86:00.0 Step7：编译并运行 hello world 程序  编译 cd dpdk/<build_dir> ## 构建输出为 build/example/dpdk-helloworld meson configure -Dexamples=helloworld
+
+---PAGE 60---
+ninja  运行 sudo ./build/examples/dpdk-helloworld -l 0-3 -n 4 3.2.2 MySQL 安装与配置 Step1：安装 MySQL 并创建新用户  安装 a) Ubuntu：sudo apt-get install mysql-server b) Debian: https://blog.csdn.net/weixin_44071721/article/details/124290374  以 root 用户登陆 MySQL，并创建数据库 sudo mysql -u root -p create database StateGridTraffic;  创建新用户，并授予新用户对数据库的权限： create user sgatd@localhost identified by 'sgatd_2022'; -- 授予 sgatd 用户对 StateGridTraffic 中所有表的所有权限 grant all on StateGridTraffic.* to sgatd@localhost; -- 授予 sgatd 用户文件操作的权限 grant FILE on *.* to 'sgatd'@'localhost'; - 刷新权限 flush privileges;  登陆新用户 mysql -u sgatd -p Step2：C 与数据库  安装 C 操作 mysql 的库 ubuntu 下 ： sudo apt-get install libmysqlclient-dev
+
+---PAGE 61---
+Step3：将 CSV 导入数据库 使用 load data infile。不过需要先配置：  开启 LOCAL INFILE 功能 show global variables like 'local_infile'; -- 查看 set global local_infile=1; -- 开启(需要 root 权限)  设置 secure_file_priv 路径为需要导入的文件路径 a) 查看： show variables like '%secure%'; -- 查看 b) 打开 MySQL 配置文件： sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf -- 打开文件 c) 在文件最后一行加入以下内容： -- 指定需要上传到数据库的文件位置 secure_file_priv = /home/seu/  修改 MySQL 对文件的权限 a) 打开配置文件： sudo vim /etc/apparmor.d/usr.sbin.mysqld -- 打开配置文件 b) 在文件中加入： # Allow data files dir access /var/lib/mysql-files/ r, /var/lib/mysql-files/** rwk, /home/seu/** rwk, --加入的内容 （需要上传到数据库的文 件位置） c) 重新导入 AppArmor 配置： /etc/init.d/apparmor reload  重新启动 mysql service mysql restart （或者是运行 sudo mysqladmin - uroot -p
+
+---PAGE 62---
+shutdown，sudo mysqld_safe &）  配置完毕 3.2.3 Nginx 安装与配置 Step1：安装 Nginx ubuntu： sudo apt-get install nginx Step2：配置 Nginx  打开配置文件 sudo vim /etc/nginx/sites-enabled/default  在配置文件中加入 location / { try_files $uri $uri/ /index.html; root /var/www/html/; } location /nmas/ { proxy_pass http://localhost:8080/; proxy_connect_timeout 60s; proxy_read_timeout 300s; proxy_send_timeout 60s; } location /nmas_data/ { alias /home/user/StateGrid/StateGridTraffic/pcaps/; } Step3：启动 Nginx sudo systemctl status nginx
+
+---PAGE 63---
+sudo systemctl enable nginx sudo nginx -t sudo systemctl start nginx 3.2.4 后端系统部署 Step1：GPU 环境搭建  Linux 下安装显卡驱动  将 ppa 存储库添加到当前系统当中 sudo add- apt-repository ppa:graphics-drivers/ppa  更新软件列表 sudo apt-get update  查看检测到的驱动程序 sudo ubuntu-drivers devices  选择合适的驱动版本安装 sudo apt install nvidia-driver-[xxx]  装完重启，用 nvidia-smi 检验是否成功，若不成功，上一步重 新选版本安装，直至成功。  CUDA-cudnn-11.6 环境安装:  下载资源包 wget https://developer.download.nvidia.com/compute/cuda/11.6.0/local_insta llers/cuda_11.6.0_510.39.01_linux.run  安装 sudo sh cuda_11.6.0_510.39.01_linux.run  Pytorch-gpu 库安装 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116 Step2：Python 依赖库安装 python3 -m pip install Django pip install django-cors-headers pip install django-rest-framework
+
+---PAGE 64---
+pip install django-crontab pip install django-picklefield pip install pymysql pip install joblib pip install func_timeout pip install dpkt sudo apt install tshark Step3：后端系统启动  进入项目根目录 cd StateGrid/StateGridTraffic/  以端口 8080 启动后端系统 nohup python3 manage.py runserver 0.0.0.0:8080 &  开启后端定时组件 python3 manage.py crontab add  进入 neo4j 目录 cd neo4j-chs-community-4.4.10-unix/bin  启动 neo4j ./neo4j start 3.3 系统安装方法 首先，将所有文件中“【】”标记处替换为个人信息（包括自定义 的用户名、密码、IP 地址等）。 3.3.1 系统后端部分安装方法 1. 将 Backend 文件夹传输到需部署服务器 2. mkdir -p /app/classify/dataset/pcaps/ 3. mkdir -p /data/ 4. ln -s /app/pcaps /data/pcaps 5. 将后端文件传入/app/目录 6. 配置 mysql、neo4j，根据需要创建对应的数据库、表 7. systemctl enable mysql 并启动 neo4j
+
+---PAGE 65---
+3.3.2 Dpdk 采集部分安装方法 1. 从官网下载并安装 DPDK 2. 设置 HugePage、 绑定网卡驱动 （dpdk-devbind.py --bind vfio-pci ens34） 3. 将 Backend_Dpdk_Collect 文件夹内容移动到需要的位置， 进入 文件夹根目录 4. meson build 5. cd build 6. ninja 7. build 文件夹中得到的可执行文件就是采集程序 8. 将可执行文件移动到/app/classify/dpdk_anomaly_flow_detector 9. chmod +x /app/classify/dpdk_anomaly_flow_detector 3.3.3 系统前端安装方法 1. 在 Frontend 文件夹根目录执行 npm run push 2. 配置 nginx 内容 cat << EOF > /etc/nginx/sites-available/default server { listen 80 default_server; listen [::]:80 default_server; root /web/; client_max_body_size 0; server_name _; location /nmas/ { proxy_pass http://127.0.0.1:8080/; proxy_connect_timeout 60s;
+
+---PAGE 66---
+proxy_read_timeout 365d; proxy_send_timeout 60s; } location /nmas_data/ { alias /app/pcaps/; } location / { index index.html index.htm; } } EOF 3. mkdir -p /web/并将编译后的内容移动到该目录 4. chown -R www-data /web/ 5. chgrp -R www-data /web/ 6. chmod -R 755 /web/ 7. systemctl enable nginx 8. systemctl restart nginx 3.3.4 数据包详情部分安装方法 1. 在 Frontend_Packet_Detail 目录执行 npm run push。 2. 将编译后的内容移动到前端部分的 packet_info 文件夹。 3.4 系统启动方法 pushd /app/ # 本文中修改后的大系统后端 依赖以下环境变量 export NEO4J_SERVER=http://127.0.0.1:7474/ export NEO4J_DATABASE=neo4j
+
+---PAGE 67---
+export NEO4J_USER=neo4j export NEO4J_PASSWORD=【】 export MYSQL_HOST=127.0.0.1 export MYSQL_PORT=【】 export MYSQL_DATABASE=【】 export MYSQL_USER=【】 export MYSQL_PASSWORD=【】 export REDIS_HOST=127.0.0.1 export REDIS_PORT=【】 export REDIS_PASSWORD=【】 export REDIS_DB=【】 export TSHARK_BIN=tshark export SHARKD=sharkd python3 manage.py runserver 0.0.0.0:8080 nohup python3 manage.py runserver 0.0.0.0:8080 & popd 3.5 使用方法（详细使用方法、图示请参考“一、功能介绍”） 3.5.1 首页 首页介绍了系统的主要功能， 并提供了进入各个功能页的入口链 接，可以直接点击前往。 3.5.2 流量采集 1. 页面顶部卡片框中可输入过滤规则。 2. 点击开始采集即可启动采集程序，点击停止可以关闭采集程 序并显示采集信息曲线。 3. 点击特征提取可以使用双向流特征提取功能，在弹出的页面 中可查看流特征，也可以将特征导出到 csv 文件。
+
+---PAGE 68---
+4. 页面下方为数据包显示区域，可以查看各个采集节点的数据 包，并且可以下载至本地使用。 5. 点击数据包名称即可进行数据包在线解析。 3.5.3 异常检测 1. 点击页面顶部的开始检测按钮可以开始进行异常检测。 2. 页面主体部分显示检测到的异常 IP 及其异常类型。 3. 点击查看可以看到异常 IP 的具体信息。 3.5.4 用户画像 1. 进入用户画像页面后等待加载，完成后显示各个 IP 之间的关 联。 2. 点击显示地图可以看到各个 IP 的地理位置，观察不同地点之 间的数据关联。 3.5.5 业务分类 1. 在业务类别映射页面，可以自由增减业务类型。 2. 在业务分类模型训练页面，可以执行模型训练和数据集生成 操作。 3. 在业务分类页面， 根据需求选择各个选项后， 点击开始分类， 等待分类完成后将在页面下方显示分类结果。 四、安全测试 为了检测是否存在恶意代码等问题，我们使用了 Github 的 Code scanning、Snyk Security 和 Dependency graph 三种检测方式进行安全 测试。 4.1 Code scanning 安全测试 4.1.1 安全测试类型 Code scanning 主要基于 CodeQL 引擎开展自动化的静态代码 分析工作。Code scanning 里存在大量预先定义好的规则集，这些规
+
+---PAGE 69---
+则是依据常见的安全漏洞类型以及代码规范制定的。 Code scanning 支持多种编程语言，如 Python、Java、JavaScript、C++ 等。我们的 Github 项目包含了 Python、JavaScript、C++等语言，Code scanning 对 原创项目进行代码解析、漏洞检测等安全测试。包括以下几个测试： ① 注入漏洞检测： 检测代码中可能导致 SQL 注入、 命令注入、 LDAP 注入等的不安全输入处理。 ② 跨站脚本（XSS）检测：识别动态生成 HTML/JavaScript 时 未正确编码的用户输入，可能导致 XSS 攻击。 ③ 路径遍历漏洞检测： 检查是否存在未验证的路径拼接，可能 导致非法访问敏感文件。 ④ 敏感数据泄露检测：扫描代码中硬编码的密码、API 密钥、 证书等敏感信息。 ⑤ 逻辑错误检测：发现代码逻辑中的潜在漏洞，如条件竞争、 未授权访问等。 ⑥ 不安全的加密存储检测：检查是否使用弱加密算法 （如 MD5） 或硬编码加密密钥。 ⑦ 资源管理漏洞检测： 识别内存泄漏、文件描述符未关闭等资 源管理问题。 ⑧ 依赖项漏洞检测： 结合依赖关系图（Dependency Graph ）分 析第三方库中的已知漏洞。 ⑨ 代码质量与潜在风险检测： 发现可能导致安全问题的代码异 味（如未使用的变量、空指针引用）。 4.1.2 安全测试结果分析 在开展全面的 Code Scanning 安全测试初始阶段，项目暴露出 103 个代码漏洞。 这些漏洞涵盖不同类型与风险等级， 对项目的安全 性和稳定性构成潜在威胁。 针对此情况， 项目团队迅速组织技术力量
+
+---PAGE 70---
+对代码进行深度审查与细致分析， 依据漏洞的具体特征、 危害程度和 成因， 制定了针对性的修复策略。 在修复过程中， 团队严格遵循软件 工程的最佳实践和行业标准， 运用先进的编程技术和工具， 对代码进 行了系统性的修改与完善。 图 4-1 Code scanning 安全测试结果 经过不断地调试和修改， 团队成功解决了全部 103 个代码漏洞， 使得项目顺利通过了所有的安全测试。 在最终的安全评估中， 高、 中、 低各个风险等级的漏洞数量均降为零，且不存在 SQL 注入、跨站脚 本攻击（XSS）、敏感信息泄露等常见的安全问题。同时，在代码质 量方面， 也未发现未使用变量、 重复代码等潜在缺陷， 表明代码的编 写严格遵循了既定的编码规范，具备较高的质量和可靠性。 4.2 Snyk Security 安全测试 4.2.1 安全测试类型 Snyk Security 提供四类核心安全测试， 覆盖应用开发的全生命周 期： ① SAST（静态应用安全测试） 通过 snyk code test 扫描源代码，检测硬编码密钥、SQL 注入、 XSS 等漏洞。采用语义分析技术，结合漏洞数据库 (CVE/NVD)和自
+
+---PAGE 71---
+定义规则， 精准定位代码风险。 支持15+语言， 输出SARIF 格式报告 集成至 GitHub Code Scanning。 ② SCA（软件成分分析） 通过 snyk test/monitor 扫描 node_modules/pom.xml 等依赖清单， 识别第三方库的已知漏洞。实时比对 Snyk 漏洞数据库（含 35 万+漏 洞记录），提供漏洞路径分析。monitor 持续监控新漏洞，通过邮件 /Slack 告警。 ③ IaC（基础设施即代码测试） 通过 snyk iac test 扫描 Terraform/Kubernetes/Dockerfile 等配置， 检测错误权限、暴露端口等风险。内置 300+云安全策略（CIS/AWS 最佳实践），防止错误配置导致云环境攻击面扩大。 ④ 容器安全测试 通过 snyk container test 分析 Docker 镜像层级， 识别基础镜像漏 洞、敏感信息泄露。结合 OS 软件包扫描，提供 CVE 修复建议。支 持与容器注册表(ECR/GCR)集成，实现镜像构建时的自动阻断。 4.2.2 安全测试结果分析 本原创项目经过全面的 Snyk Security 测 试 ，在 SAST 中未发现 代码逻辑漏洞和注入风险，所有关键业务逻辑均通过安全扫描验证； SCA 确认项目依赖的开源组件无已知高危漏洞，所有第三方库版本 均处于维护状态且符合安全基线要求；IaC 验证了云资源配置的合规 性，网络策略、访问控制列表等基础设施代码均通过安全策略检查； 容器安全测试确保所有镜像无恶意软件， 镜像构建过程符合最小化原 则，未发现敏感信息泄露风险。
+
+---PAGE 72---
+图 4-2 Snyk Security 安全测试结果 测试覆盖了从代码编写到容器部署的全生命周期， 所有测试项均 达到企业安全标准， 未产生任何关键或高危级别的安全警报， 项目整 体安全状态符合持续交付要求。 4.3 Dependency graph 安全测试 4.3.1 安全测试类型 使用 Dependency graph 测试，GitHub 会将构建好的依赖图与公 共的漏洞数据库进行持续比对，比如国家漏洞数据库 NVD。通过比 对，GitHub 可以找出项目中使用的依赖项是否存在已知的安全漏洞。 此外，Dependency graph 会实时监测我们开源项目依赖项的变化。 主 要包括以下几个测试： ① 已知漏洞检测 原理： 将项目依赖项的版本信息与公共漏洞数据库 （如国家漏洞 数据库 NVD、CVE 数据库等）进行比对，识别出依赖项中已知的 安全漏洞。：GitHub 会在项目仓库的 “Security” 选项卡中生成安全 警报，显示漏洞的详细信息，如漏洞类型、严重程度、受影响的依赖 项版本范围以及相关的 CVE 编号等。 ② 依赖项更新检查
+
+---PAGE 73---
+原理： 持续监控项目依赖项的版本变化， 当有新版本发布时， 分 析新版本是否修复了已知的安全漏洞。在仓库的 “Security” 选项卡 中显示可更新的依赖项列表， 提醒开发者及时更新依赖项以提高项目 的安全性。 ③ 供应链攻击风险评估 评估依赖项的来源和维护情况， 判断是否存在供应链攻击的风险。 以警告或提示的形式告知开发者潜在的供应链攻击风险， 帮助他们做 出决策，如是否继续使用该依赖项或寻找替代方案。 ④ 依赖项兼容性测试 检查项目依赖的各个组件之间是否兼容， 避免因版本不兼容而导 致的安全问题或功能异常。 在安全报告中指出可能存在的兼容性问题， 并提供相关的建议，如调整依赖项的版本或寻找替代的兼容库。 ⑤ 依赖项许可证合规性检查 验证项目使用的依赖项是否符合相关的开源许可证要求， 避免因 许可证违规而带来的法律风险。 生成许可证合规性报告， 列出项目依 赖项的许可证信息，并指出是否存在许可证违规的情况。 4.3.2 安全测试结果分析 经过全面的 Dependency graph 安全测试， 该项目通过自动化修复 和人工优化，成功将初始的 63 个安全警报清零。
+
+---PAGE 74---
+图 4-3 Dependency graph 安全测试结果 测试结果显示，所有依赖项均未匹配国家漏洞数据库（ NVD） 中的已知漏洞，关键依赖项均处于最新稳定版本且无未修复的 CVE 记录； 依赖项更新检查确认项目依赖生态健康， 不存在长期未维护或 过时的组件； 供应链攻击风险评估未发现恶意依赖注入或异常依赖路 径， 依赖项来源均通过可信验证； 依赖项兼容性测试验证了跨版本和 跨组件的协作稳定性，无版本冲突或功能失效风险。 测试过程中通过实时依赖监控和持续漏洞比对， 实现了供应链安 全的全周期覆盖， 所有修复措施均通过自动化验证和人工复核双重确 认， 项目依赖生态达到安全基线标准， 具备可持续交付的安全保障能 力。 4.4 安全测试总结 如图 4-1、4-2、4-3 所示，经过 Code scanning 、Snyk Security 和 Dependency graph 的安全检测后，我们修改了 103 个代码漏洞、 解决了 63 个警报，通过了 3 项安全测试。 最后， 我们也部署了基于CodeQL 设置的 Github-Action， 实现对 所有 C++、JavaScript、Python 文件的安全扫描，并通过了全部的安 全测试分析。
+
+---PAGE 75---
+图 4-4 基于 CodeQL 设置的 Github-Action 的安全扫描分析 五、代码截图 原创软件 Traffic - Analysis - Base - DPDK 将前后端代码整理到 4 个文件夹中：Backend 文件夹包括后端代码，Backend_Dpdk_Collect 文件夹包括后端 Dpdk 采集部分，Frontend 文件夹包括系统前端代码， Frontend_Packet_Detail 文件夹为数据包详情部分前端代码。 图 5-1 项目文件夹汇总 Traffic - Analysis - Base - DPDK 代码总行数通过 git 命令统计确 认为 72 万行.排除第三方库的引用和注释行，独立开发代码行数不少 于 50 万行，远超过 1000 行的要求。
+
+---PAGE 76---
+图 5-2 Git 命令统计代码行 图 5-3 GitHub 统计的不同语言占比 5.1 后端代码 Backend 中包括启动一个 A3C 监听并输出信息、 基于已有统计特 征的分类模型权重，对目标流量（csv 文件）预测，输出预测结果、 对数据库中 Flowtables 表的数据进行业务类别预测， 并将预测结果更 新回数据库等程序。 图 5-4 后端代码文件 5.2 后端 Dpdk 采集 Backend_Dpdk_Collect 包括使用 DPDK（Data Plane Development
+
+---PAGE 77---
+Kit）库从指定的网卡端口和队列捕获数据包、从环形缓冲区读取数 据包、将数据包写入 pcap 文件（支持压缩和非压缩模式）、根据特 定条件过滤数据包、 提取 IPv4 和 IPv6 流特征、 将流特征写入 CSV 文件并上传到 MySQL 数据库、从 PCAP 文件中提取特定协议的网 络流特征，并将提取的特征保存为 CSV 文件。 图 5-5 Dpdk 采集代码文件 5.3 系统前端代码 Frontend 包括 DPDK 的首页前端界面、 流量采集前端界面、 实时 双向流特征提取界面、异常检测前端界面、异常检测报告前端界面、 用户画像前端界面和业务分类前端界面。 图 5-6 系统前端代码文件 5.4 数据包详情部分前端代码 Frontend_Packet_Detail 为在线报文解析前端界面、 实施模式前端 界面、数据包可折叠的列表前端界面。
+
+---PAGE 78---
+图 5-7 数据包详情部分前端代码文件
+
