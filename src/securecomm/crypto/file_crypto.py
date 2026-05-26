@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,7 +21,7 @@ from securecomm.crypto.primitives import CryptoPrimitives
 from securecomm.crypto.randoms import derive_nonce, now_epoch, random_bytes
 from securecomm.errors import CryptoError, SignatureError
 from securecomm.utils.encoding import b64d, b64e, canonical_json_bytes, copy_without_keys
-from securecomm.utils.files import file_sha256, join_chunks, split_file
+from securecomm.utils.files import file_sha256
 from securecomm.utils.validation import require_chunk_size
 
 
@@ -117,38 +119,50 @@ class HybridFileCipher:
     ) -> FileEnvelope:
         """Encrypt binary file and return signed file envelope."""
         checked_chunk = require_chunk_size(chunk_size)
-        chunks_plain = split_file(input_path, checked_chunk)
+        if not input_path.exists() or not input_path.is_file():
+            raise CryptoError(f"input file not found: {input_path}")
+
+        file_size = input_path.stat().st_size
+        source_sha = file_sha256(input_path)
 
         ephemeral_private = x25519.X25519PrivateKey.generate()
         eph_public = ephemeral_private.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+
         shared_secret = CryptoPrimitives.x25519_agree(
             private_key=ephemeral_private,
             public_key=recipient_enc_public,
         )
-
         hkdf_salt = random_bytes(32)
         session_key = CryptoPrimitives.derive_session_key(shared_secret=shared_secret, salt=hkdf_salt)
 
         nonce_seed = random_bytes(12)
         encrypted_chunks: list[dict[str, str | int]] = []
+        chunk_count = 0
 
-        for index, plain_chunk in enumerate(chunks_plain):
-            chunk_nonce = derive_nonce(nonce_seed, index, size=12)
-            aad = self._chunk_aad(sender_id, recipient_id, input_path.name, index)
-            aes = CryptoPrimitives.aes_gcm_encrypt_with_nonce(
-                key=session_key,
-                nonce=chunk_nonce,
-                plaintext=plain_chunk,
-                aad=aad,
-            )
-            encrypted_chunks.append(
-                {
-                    "index": index,
-                    "nonce": b64e(chunk_nonce),
-                    "ciphertext": b64e(aes.ciphertext),
-                    "aad": b64e(aad),
-                }
-            )
+        with input_path.open("rb") as fh:
+            while True:
+                plain_chunk = fh.read(checked_chunk)
+                if not plain_chunk:
+                    break
+
+                chunk_nonce = derive_nonce(nonce_seed, chunk_count, size=12)
+                aad = self._chunk_aad(sender_id, recipient_id, input_path.name, chunk_count)
+                aes = CryptoPrimitives.aes_gcm_encrypt_with_nonce(
+                    key=session_key,
+                    nonce=chunk_nonce,
+                    plaintext=plain_chunk,
+                    aad=aad,
+                )
+
+                encrypted_chunks.append(
+                    {
+                        "index": chunk_count,
+                        "nonce": b64e(chunk_nonce),
+                        "ciphertext": b64e(aes.ciphertext),
+                        "aad": b64e(aad),
+                    }
+                )
+                chunk_count += 1
 
         envelope_wo_sig: dict[str, object] = {
             "version": SCHEMA_VERSION,
@@ -159,15 +173,16 @@ class HybridFileCipher:
             "sender_id": sender_id,
             "recipient_id": recipient_id,
             "file_name": input_path.name,
-            "file_size": input_path.stat().st_size,
-            "file_sha256": file_sha256(input_path),
+            "file_size": file_size,
+            "file_sha256": source_sha,
             "chunk_size": checked_chunk,
-            "chunk_count": len(encrypted_chunks),
+            "chunk_count": chunk_count,
             "eph_public_key": b64e(eph_public),
             "hkdf_salt": b64e(hkdf_salt),
             "nonce_seed": b64e(nonce_seed),
             "chunks": encrypted_chunks,
         }
+
         sign_blob = canonical_json_bytes(envelope_wo_sig)
         signature = CryptoPrimitives.sign_data(sender_sign_private, sign_blob)
 
@@ -182,12 +197,12 @@ class HybridFileCipher:
         sender_sign_public: ed25519.Ed25519PublicKey,
         output_path: Path,
     ) -> dict[str, object]:
-        """Decrypt file envelope and write reconstructed output file."""
+        """Decrypt file envelope and write reconstructed output file atomically."""
         self.validate_envelope(envelope)
+
         env_dict = envelope.to_dict()
         signature_b64 = str(env_dict["signature"])
         env_wo_sig = copy_without_keys(env_dict, {"signature"})
-
         signed_blob = canonical_json_bytes(env_wo_sig)
         signature = b64d(signature_b64)
         if not CryptoPrimitives.verify_data(sender_sign_public, signature=signature, message=signed_blob):
@@ -200,30 +215,47 @@ class HybridFileCipher:
         shared_secret = CryptoPrimitives.x25519_agree(recipient_enc_private, eph_public)
         session_key = CryptoPrimitives.derive_session_key(shared_secret=shared_secret, salt=hkdf_salt)
 
-        plain_chunks: list[bytes] = []
-        for raw_chunk in envelope.chunks:
-            idx = int(raw_chunk["index"])
-            stored_nonce = b64d(str(raw_chunk["nonce"]))
-            expected_nonce = derive_nonce(nonce_seed, idx, size=12)
-            if stored_nonce != expected_nonce:
-                raise CryptoError("chunk nonce mismatch; envelope tampered")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            aad = b64d(str(raw_chunk.get("aad", "")))
-            cipher = b64d(str(raw_chunk["ciphertext"]))
-            plain = CryptoPrimitives.aes_gcm_decrypt(session_key, stored_nonce, cipher, aad=aad)
-            plain_chunks.append(plain)
+        # Validate and sort chunk order before decrypt.
+        normalized_chunks = self._normalize_and_validate_chunks(envelope.chunks, envelope.chunk_count)
 
-        join_chunks(output_path, plain_chunks)
-        out_digest = file_sha256(output_path)
-        expected_digest = envelope.file_sha256
-        if out_digest != expected_digest:
+        hasher = hashlib.sha256()
+        total_written = 0
+
+        tmp_name = ""
+        with tempfile.NamedTemporaryFile("wb", delete=False, dir=str(output_path.parent), prefix=".securecomm_tmp_") as tf:
+            tmp_name = tf.name
+            for raw_chunk in normalized_chunks:
+                idx = int(raw_chunk["index"])
+                stored_nonce = b64d(str(raw_chunk["nonce"]))
+                expected_nonce = derive_nonce(nonce_seed, idx, size=12)
+                if stored_nonce != expected_nonce:
+                    raise CryptoError("chunk nonce mismatch; envelope tampered")
+
+                aad = b64d(str(raw_chunk.get("aad", "")))
+                cipher = b64d(str(raw_chunk["ciphertext"]))
+                plain = CryptoPrimitives.aes_gcm_decrypt(session_key, stored_nonce, cipher, aad=aad)
+
+                tf.write(plain)
+                hasher.update(plain)
+                total_written += len(plain)
+
+        calculated_sha = hasher.hexdigest()
+        if calculated_sha != envelope.file_sha256:
+            try:
+                Path(tmp_name).unlink(missing_ok=True)
+            except Exception:
+                pass
             raise CryptoError("decrypted file hash mismatch")
+
+        Path(tmp_name).replace(output_path)
 
         return {
             "output_path": str(output_path),
-            "size": output_path.stat().st_size,
-            "sha256": out_digest,
-            "chunk_count": len(plain_chunks),
+            "size": total_written,
+            "sha256": calculated_sha,
+            "chunk_count": len(normalized_chunks),
         }
 
     def validate_envelope(self, envelope: FileEnvelope) -> None:
@@ -240,6 +272,36 @@ class HybridFileCipher:
             raise CryptoError("invalid chunk size")
         if envelope.chunk_count != len(envelope.chunks):
             raise CryptoError("chunk_count does not match chunks list")
+        if envelope.file_size < 0:
+            raise CryptoError("invalid file_size")
+        if len(envelope.file_sha256) != 64:
+            raise CryptoError("invalid file_sha256 format")
+
+    def _normalize_and_validate_chunks(self, chunks: list[dict[str, str | int]], expected_count: int) -> list[dict[str, str | int]]:
+        """Validate chunk index integrity and return chunks sorted by index."""
+        normalized: list[dict[str, str | int]] = []
+        seen: set[int] = set()
+
+        for item in chunks:
+            if "index" not in item or "nonce" not in item or "ciphertext" not in item:
+                raise CryptoError("invalid chunk item")
+            idx = int(item["index"])
+            if idx < 0:
+                raise CryptoError("chunk index cannot be negative")
+            if idx in seen:
+                raise CryptoError("duplicate chunk index detected")
+            seen.add(idx)
+            normalized.append(item)
+
+        if len(normalized) != expected_count:
+            raise CryptoError("chunk count mismatch after normalization")
+
+        normalized.sort(key=lambda x: int(x["index"]))
+        for expected_idx, item in enumerate(normalized):
+            if int(item["index"]) != expected_idx:
+                raise CryptoError("chunk indices must be contiguous from 0")
+
+        return normalized
 
     def _chunk_aad(self, sender_id: str, recipient_id: str, file_name: str, index: int) -> bytes:
         """Build deterministic AAD bytes for each chunk."""
