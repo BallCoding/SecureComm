@@ -53,6 +53,25 @@ class MessageEnvelope:
     @staticmethod
     def from_dict(data: dict[str, str | int]) -> "MessageEnvelope":
         """Construct dataclass from dictionary."""
+        required = {
+            "version",
+            "envelope_type",
+            "algorithm",
+            "signature_algorithm",
+            "created_at",
+            "sender_id",
+            "recipient_id",
+            "eph_public_key",
+            "hkdf_salt",
+            "nonce",
+            "aad",
+            "ciphertext",
+            "signature",
+        }
+        missing = required - set(data.keys())
+        if missing:
+            raise CryptoError(f"message envelope missing fields: {', '.join(sorted(missing))}")
+
         return MessageEnvelope(
             version=str(data["version"]),
             envelope_type=str(data["envelope_type"]),
@@ -85,15 +104,21 @@ class HybridMessageCipher:
         """Encrypt plaintext and return signed envelope."""
         ephemeral_private = x25519.X25519PrivateKey.generate()
         ephemeral_public = ephemeral_private.public_key()
+        eph_public_raw = ephemeral_public.public_bytes(Encoding.Raw, PublicFormat.Raw)
 
         shared_secret = CryptoPrimitives.x25519_agree(ephemeral_private, recipient_enc_public)
         hkdf_salt = random_bytes(32)
-        session_key = CryptoPrimitives.derive_session_key(shared_secret=shared_secret, salt=hkdf_salt)
+
+        session_key = CryptoPrimitives.derive_session_key(
+            shared_secret=shared_secret,
+            salt=hkdf_salt,
+            info=self._key_info(sender_id, recipient_id, eph_public_raw),
+        )
 
         aad = self._build_aad(
             sender_id=sender_id,
             recipient_id=recipient_id,
-            eph_public=ephemeral_public.public_bytes(Encoding.Raw, PublicFormat.Raw),
+            eph_public=eph_public_raw,
             extra=aad_extra,
         )
 
@@ -107,12 +132,13 @@ class HybridMessageCipher:
             "created_at": now_epoch(),
             "sender_id": sender_id,
             "recipient_id": recipient_id,
-            "eph_public_key": b64e(ephemeral_public.public_bytes(Encoding.Raw, PublicFormat.Raw)),
+            "eph_public_key": b64e(eph_public_raw),
             "hkdf_salt": b64e(hkdf_salt),
             "nonce": b64e(cipher.nonce),
             "aad": b64e(aad),
             "ciphertext": b64e(cipher.ciphertext),
         }
+
         to_sign = canonical_json_bytes(envelope_wo_sig)
         signature = CryptoPrimitives.sign_data(sender_sign_private, to_sign)
 
@@ -127,7 +153,9 @@ class HybridMessageCipher:
         sender_sign_public: ed25519.Ed25519PublicKey,
     ) -> bytes:
         """Verify signature and decrypt envelope payload."""
+        self.validate_envelope(envelope)
         data = envelope.to_dict()
+
         sig_value = data.get("signature")
         if not isinstance(sig_value, str):
             raise SignatureError("envelope missing signature")
@@ -140,7 +168,8 @@ class HybridMessageCipher:
             raise SignatureError("signature verification failed")
 
         try:
-            eph_pub = x25519.X25519PublicKey.from_public_bytes(b64d(str(data["eph_public_key"])))
+            eph_public_raw = b64d(str(data["eph_public_key"]))
+            eph_pub = x25519.X25519PublicKey.from_public_bytes(eph_public_raw)
         except Exception as exc:
             raise CryptoError("invalid ephemeral public key") from exc
 
@@ -149,8 +178,22 @@ class HybridMessageCipher:
         aad = b64d(str(data["aad"]))
         ciphertext = b64d(str(data["ciphertext"]))
 
+        # Defensive AAD consistency check.
+        expected_aad_prefix = self._build_aad(
+            sender_id=str(data["sender_id"]),
+            recipient_id=str(data["recipient_id"]),
+            eph_public=eph_public_raw,
+            extra=b"",
+        )
+        if not aad.startswith(expected_aad_prefix):
+            raise CryptoError("AAD content mismatch with envelope metadata")
+
         shared_secret = CryptoPrimitives.x25519_agree(recipient_enc_private, eph_pub)
-        session_key = CryptoPrimitives.derive_session_key(shared_secret=shared_secret, salt=hkdf_salt)
+        session_key = CryptoPrimitives.derive_session_key(
+            shared_secret=shared_secret,
+            salt=hkdf_salt,
+            info=self._key_info(str(data["sender_id"]), str(data["recipient_id"]), eph_public_raw),
+        )
         return CryptoPrimitives.aes_gcm_decrypt(key=session_key, nonce=nonce, ciphertext=ciphertext, aad=aad)
 
     def _build_aad(self, sender_id: str, recipient_id: str, eph_public: bytes, extra: bytes = b"") -> bytes:
@@ -161,6 +204,16 @@ class HybridMessageCipher:
             recipient_id.encode("utf-8"),
             eph_public,
             extra,
+        ]
+        return b"|".join(fields)
+
+    def _key_info(self, sender_id: str, recipient_id: str, eph_public: bytes) -> bytes:
+        """Build HKDF info binding session key to communication context."""
+        fields = [
+            b"securecomm-session-v2",
+            sender_id.encode("utf-8"),
+            recipient_id.encode("utf-8"),
+            eph_public,
         ]
         return b"|".join(fields)
 
@@ -176,6 +229,12 @@ class HybridMessageCipher:
             raise CryptoError(f"invalid signature algorithm: {envelope.signature_algorithm}")
         if not envelope.sender_id or not envelope.recipient_id:
             raise CryptoError("sender/recipient id missing")
+        if envelope.created_at <= 0:
+            raise CryptoError("invalid created_at")
+        if len(envelope.eph_public_key) < 20:
+            raise CryptoError("invalid eph_public_key")
+        if len(envelope.signature) < 20:
+            raise CryptoError("invalid signature")
 
     def rotate_aad(self, envelope: MessageEnvelope, extra: bytes) -> MessageEnvelope:
         """Return copied envelope with modified AAD for testing negative cases."""
