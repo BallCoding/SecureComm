@@ -7,6 +7,33 @@ import argparse
 from securecomm.constants import VERSION
 
 
+def _add_secret_source_flags(sub: argparse.ArgumentParser, option_name: str, label: str) -> None:
+    """Add secure secret input options: literal / stdin / prompt."""
+    py_name = option_name.replace("-", "_")
+    group = sub.add_mutually_exclusive_group(required=True)
+    group.add_argument(f"--{option_name}", dest=py_name, help=f"{label} (plaintext argument)")
+    group.add_argument(
+        f"--{option_name}-stdin",
+        dest=f"{py_name}_stdin",
+        action="store_true",
+        help=f"read {label} from stdin (single line)",
+    )
+    group.add_argument(
+        f"--{option_name}-prompt",
+        dest=f"{py_name}_prompt",
+        action="store_true",
+        help=f"prompt {label} securely",
+    )
+
+
+def _add_text_source_flags(sub: argparse.ArgumentParser, required: bool = True) -> None:
+    """Add text input source options."""
+    group = sub.add_mutually_exclusive_group(required=required)
+    group.add_argument("--text", help="plaintext text")
+    group.add_argument("--text-file", help="read plaintext text from UTF-8 file")
+    group.add_argument("--text-stdin", action="store_true", help="read plaintext text from stdin")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build top-level argparse parser with subcommands."""
     parser = argparse.ArgumentParser(
@@ -34,7 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
     et = sub.add_parser("encrypt-text", help="encrypt text message")
     et.add_argument("--sender", required=True, help="sender user id")
     et.add_argument("--recipient", required=True, help="recipient user id")
-    et.add_argument("--text", required=True, help="plaintext message")
+    _add_text_source_flags(et, required=True)
     et.add_argument("--aad", default="", help="optional additional authenticated data")
     et.add_argument("--output", help="output envelope path")
 
@@ -67,18 +94,18 @@ def build_parser() -> argparse.ArgumentParser:
     vf.add_argument("--signature", required=True, help="signature envelope path")
 
     ve = sub.add_parser("vault-encrypt", help="password encrypt text")
-    ve.add_argument("--text", required=True, help="text to encrypt")
-    ve.add_argument("--password", required=True, help="encryption password")
+    _add_text_source_flags(ve, required=True)
+    _add_secret_source_flags(ve, "password", "encryption password")
     ve.add_argument("--output", help="vault output path")
     ve.add_argument("--pbkdf2", action="store_true", help="use PBKDF2 instead of Argon2id")
 
     vd = sub.add_parser("vault-decrypt", help="password decrypt text")
-    vd.add_argument("--password", required=True, help="decryption password")
+    _add_secret_source_flags(vd, "password", "decryption password")
     vd.add_argument("--input", required=True, help="vault file path")
 
     vr = sub.add_parser("vault-rotate", help="rotate vault password")
-    vr.add_argument("--old-password", required=True, help="old password")
-    vr.add_argument("--new-password", required=True, help="new password")
+    _add_secret_source_flags(vr, "old-password", "old password")
+    _add_secret_source_flags(vr, "new-password", "new password")
     vr.add_argument("--input", required=True, help="existing vault file")
     vr.add_argument("--output", required=True, help="new vault file")
     vr.add_argument("--pbkdf2", action="store_true", help="use PBKDF2 instead of Argon2id")
